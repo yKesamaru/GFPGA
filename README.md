@@ -1,4 +1,4 @@
-# 画像拡大マスター：超解像セットアップシリーズ②
+# 画像拡大マスター：超解像セットアップシリーズ② GFPGAN
 超解像シリーズは全部で4編書きます。
 1.　MAX Image Resolution Enhancer
 2.　GFPGAN
@@ -9,25 +9,26 @@
 
 今回は、`GFPGAN`です。
 
-![](assets/eye_catch.png)
+![](https://raw.githubusercontent.com/yKesamaru/GFPGA/master/assets/eye_catch.png)
 
 ## 出力結果
 顔に特化した学習モデルを用いるため、一般物（ここでは猫）に対しては、あまり効果がありません。
 ### 元画像
-![](assets/image4539.png)
-![](assets/image4556.png)
-![](assets/三浦理恵子_KofV.jpg..png.png_align_resize.png)
+![](https://raw.githubusercontent.com/yKesamaru/GFPGA/master/assets/image4539.png)
+![](https://raw.githubusercontent.com/yKesamaru/GFPGA/master/assets/image4556.png)
+![](https://raw.githubusercontent.com/yKesamaru/GFPGA/master/assets/三浦理恵子_KofV.jpg..png.png_align_resize.png)
 ### 超解像画像
-![](assets/image4539_restored.png)
-![](assets/image4556_restored.png)
-![](assets/三浦理恵子_KofV.jpg..png.png_align_resize_restored.png)
+![](https://raw.githubusercontent.com/yKesamaru/GFPGA/master/assets/image4539_restored.png)
+![](https://raw.githubusercontent.com/yKesamaru/GFPGA/master/assets/image4556_restored.png)
+![](https://raw.githubusercontent.com/yKesamaru/GFPGA/master/assets/三浦理恵子_KofV.jpg..png.png_align_resize_restored.png)
 
-- [画像拡大マスター：超解像セットアップシリーズ②](#画像拡大マスター超解像セットアップシリーズ)
+- [画像拡大マスター：超解像セットアップシリーズ② GFPGAN](#画像拡大マスター超解像セットアップシリーズ-gfpgan)
   - [出力結果](#出力結果)
     - [元画像](#元画像)
     - [超解像画像](#超解像画像)
   - [GFPGANとは](#gfpganとは)
     - [論文](#論文)
+      - [主なポイント：](#主なポイント)
   - [ホスト環境](#ホスト環境)
   - [ローカル環境構築](#ローカル環境構築)
   - [推論の実行](#推論の実行)
@@ -45,12 +46,18 @@ GFPGANがどのように顔画像を復元できるのかを確認できるデ�
 
 https://arc.tencent.com/en/ai-demos/faceRestoration
 
-![](assets/2023-10-22-07-24-50.png)
+![](https://raw.githubusercontent.com/yKesamaru/GFPGA/master/assets/2023-10-22-07-24-50.png)
 
 ### 論文
 Towards Real-World Blind Face Restoration with Generative Facial Prior
 
 https://arxiv.org/pdf/2101.04061.pdf
+
+#### 主なポイント：
+1. **問題設定**: 通常、顔の復元は顔の事前知識に依存していて、非常に低い品質の入力は正確な幾何学的事前知識を提供できないため、リアルワールドのシナリオでの適用が限られている。
+2. **GFP-GANの提案**: 著者らは、事前に訓練された顔のGANにカプセル化された豊かで多様な事前知識を利用するGFP-GANを提案している。このGenerative Facial Prior (GFP)は、空間特徴変換層を介して顔の復元プロセスに組み込まれ、実際と忠実さの良いバランスを達成する。
+3. **性能**: GFP-GANは、単一のフォワードパスだけで顔の詳細と色を同時に復元・強化でき、GAN反転方法は推論時に画像固有の最適化を要求するが、GFP-GANはそれを必要としない。
+
 
 ## ホスト環境
 ```bash
