@@ -11,6 +11,12 @@
 
 ![](https://raw.githubusercontent.com/yKesamaru/GFPGA/master/assets/eye_catch.png)
 
+https://zenn.dev/ykesamaru/articles/86ace66f116553
+
+https://zenn.dev/ykesamaru/articles/fae6f5f30e5522
+
+https://zenn.dev/ykesamaru/articles/3390b749b284bb
+
 ## 出力結果
 顔に特化した学習モデルを用いるため、一般物（ここでは猫）に対しては、あまり効果がありません。
 ### 元画像
@@ -32,6 +38,7 @@
   - [ホスト環境](#ホスト環境)
   - [ローカル環境構築](#ローカル環境構築)
   - [推論の実行](#推論の実行)
+    - [追記：2023年10月24日](#追記2023年10月24日)
     - [引数一覧](#引数一覧)
   - [まとめ](#まとめ)
 
@@ -149,6 +156,18 @@ GFPGAN/experiments/pretrained_models
 ```
 
 ## 推論の実行
+
+---
+
+### 追記：2023年10月24日
+
+リポジトリのREADME.mdには記載がありませんが、入力画像サイズによりsegmentation faultが発生することがあります。
+500x500pxの場合、エラーは発生しませんでした。
+入力サイズについて、全てのパターンを試したわけではありません。しかしエラーが発生してしまう場合には、入力サイズを疑ってみて下さい。
+これは同じTencentARCが保有しているVQFRリポジトリにも共通しています。
+
+---
+
    `inference_gfpgan.py` スクリプトを使って画像の超解像を実行します。この例では、`1.png`という画像に対して操作を行っています。
 ```bash
 (GFPGAN) $ python inference_gfpgan.py -i /home/user/ダウンロード/1.png  -v 1.4 -s 2
