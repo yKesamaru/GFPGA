@@ -38,8 +38,12 @@ https://zenn.dev/ykesamaru/articles/3390b749b284bb
   - [ホスト環境](#ホスト環境)
   - [ローカル環境構築](#ローカル環境構築)
   - [推論の実行](#推論の実行)
+    - [追記：2023年10月26日](#追記2023年10月26日)
+      - [CUDA\_LAUNCH\_BLOCKING=1](#cuda_launch_blocking1)
+      - [ライブラリパスの追加](#ライブラリパスの追加)
     - [追記：2023年10月24日](#追記2023年10月24日)
     - [引数一覧](#引数一覧)
+  - [計算資源](#計算資源)
   - [まとめ](#まとめ)
 
 ## GFPGANとは
@@ -158,11 +162,47 @@ GFPGAN/experiments/pretrained_models
 ## 推論の実行
 
 ---
+### 追記：2023年10月26日
+```bash
+export CUDA_LAUNCH_BLOCKING=1
+export LD_LIBRARY_PATH=/home/user/bin/GFPGA/GFPGAN/lib64/python3.8/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
+mogrify my_image/*.png -scale 600x600 my_image/*.png
+python inference_gfpgan.py -i my_images/ -v 1.4 -s 1  # 1倍の超解像
+mogrify results/restored_imgs/*.png -scale 224x224 results/restored_imgs/*.png
+```
+#### CUDA_LAUNCH_BLOCKING=1
+`CUDA_LAUNCH_BLOCKING=1`と設定して、CUDAカーネルの実行をブロッキングモードにし、CUDAカーネルが同期的に実行されるようにします。
+これを行わない場合、複数画像の処理に失敗します。
+
+#### ライブラリパスの追加
+`LD_LIBRARY_PATH`に、`nvidia-nvjitlink-cu12`のライブラリパスを追加します。
+この解決法は以下を参照して下さい。
+
+ImportError: /usr/local/lib/python3.10/dist-packages/torch/lib/../../nvidia/cusparse/lib/libcusparse.so.12: undefined symbol: __nvJitLinkAddData_12_1, version libnvJitLink.so.12 #111469
+
+https://github.com/pytorch/pytorch/issues/111469#issuecomment-1773937884
+
+これを設定しない場合、以下のようなエラーが発生します。
+（`libcusparse.so.12`が存在しないと出力される）
+``` bash
+python inference_gfpgan.py my_images -v 1.4 -s 2
+Traceback (most recent call last):
+  File "inference_gfpgan.py", line 6, in <module>
+    import torch
+  File "/home/user/bin/GFPGA/GFPGAN/lib/python3.8/site-packages/torch/__init__.py", line 235, in <module>
+    from torch._C import *  # noqa: F403
+ImportError: /home/user/bin/GFPGA/GFPGAN/lib/python3.8/site-packages/torch/lib/../../nvidia/cusparse/lib/libcusparse.so.12: undefined symbol: __nvJitLinkAddData_12_1, version libnvJitLink.so.12
+```
+
+`libcusparse-12-1`をインストールしても解決しますが、その場合、システムに存在する`libcusparse-12-0`と競合しますので、やってはいけません。
+
+---
+---
 
 ### 追記：2023年10月24日
 
 リポジトリのREADME.mdには記載がありませんが、入力画像サイズによりsegmentation faultが発生することがあります。
-500x500pxの場合、エラーは発生しませんでした。
+600x600pxの場合、エラーは発生しませんでした。
 入力サイズについて、全てのパターンを試したわけではありません。しかしエラーが発生してしまう場合には、入力サイズを疑ってみて下さい。
 これは同じTencentARCが保有しているVQFRリポジトリにも共通しています。
 
@@ -201,10 +241,10 @@ Processing 1.png ...
 Results are in the [results] folder.
 ```
 
+
 ### 引数一覧
 ```bash
-Usage: python inference_gfpgan.py -i inputs/whole_imgs -o results -v 1.3 -s 2 [options]...
-
+Usage: 
   -h                   show this help
   -i input             Input image or folder. Default: inputs/whole_imgs
   -o output            Output folder. Default: results
@@ -217,6 +257,11 @@ Usage: python inference_gfpgan.py -i inputs/whole_imgs -o results -v 1.3 -s 2 [o
   -aligned             Input are aligned faces
   -ext                 Image extension. Options: auto | jpg | png, auto means using the same extension as inputs. Default: auto
 ```
+
+## 計算資源
+![](https://raw.githubusercontent.com/yKesamaru/GFPGA/master/assets/2023-10-26-17-31-26.png)
+
+![](https://raw.githubusercontent.com/yKesamaru/GFPGA/master/assets/2023-10-26-17-31-56.png)
 
 ## まとめ
 GFPGANを用いた、Face Restorationのローカル環境構築と、その結果を確認しました。
